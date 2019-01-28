@@ -25,6 +25,7 @@ namespace chip8emu.emu
         }
 
         /// <summary>
+        /// 00EE
         /// Return from a subroutine
         /// The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
         /// </summary>
@@ -35,6 +36,7 @@ namespace chip8emu.emu
         }
 
         /// <summary>
+        /// 1nnn
         /// Jump to location nnn
         /// The interpreter sets the program counter to nnn
         /// </summary>
@@ -45,6 +47,7 @@ namespace chip8emu.emu
         }
 
         /// <summary>
+        /// 2nnn
         /// Call subroutine at nnn
         /// The interpreter increments the stack pointer, then puts the current
         /// PC on the top of the stack. The PC is then set to nnn
@@ -54,6 +57,17 @@ namespace chip8emu.emu
             memory.SP++;
             memory.stack[memory.SP] = memory.PC;
             memory.PC = (ushort)(memory.opcode & 0x0FFF);
+        }
+
+        /// <summary>
+        /// 3xkk
+        /// Skip next instruction if Vx = kk
+        /// The interpreter compares register Vx to kk, and if they are equal,
+        /// increments the program counter by 2.
+        /// </summary>
+        public void SE()
+        {
+
         }
     }
 }

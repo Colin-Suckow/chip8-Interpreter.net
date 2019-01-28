@@ -69,5 +69,13 @@ namespace chip8emuTests
             Assert.AreEqual(testOpcode, memory.stack[memory.SP], 0, "Did not properly store current opcode");
             Assert.AreEqual(0x0111, memory.PC, 0, "Did not properly set PC to input value");
         }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SE_Test()
+        {
+            
+        }
+
     }
 }
