@@ -9,6 +9,8 @@ namespace chip8emu.emu
     public class Instructions
     {
 
+        // http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#1.0
+
         Memory memory;
 
         public Instructions(Memory memory)
@@ -40,6 +42,18 @@ namespace chip8emu.emu
         {
             memory.PC = (ushort) (memory.opcode & 0x0FFF);
             memory.SP--;
+        }
+
+        /// <summary>
+        /// Call subroutine at nnn
+        /// The interpreter increments the stack pointer, then puts the current
+        /// PC on the top of the stack. The PC is then set to nnn
+        /// </summary>
+        public void CALL()
+        {
+            memory.SP++;
+            memory.stack[memory.SP] = memory.PC;
+            memory.PC = (ushort)(memory.opcode & 0x0FFF);
         }
     }
 }

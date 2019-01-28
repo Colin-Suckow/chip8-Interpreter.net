@@ -28,12 +28,14 @@ namespace chip8emuTests
         [TestCategory("Instruction")]
         public void RET_Test()
         {
+            byte testLocation = 5;
             byte testValue = 10;
 
             memory.SP = testValue;
+            memory.stack[testLocation] = testValue;
             instructions.RET();
 
-            Assert.AreEqual(memory.PC, testValue, 0, "Did not set PC equal to SP");
+            Assert.AreEqual(memory.stack[testLocation], testValue, 0, "Did not set PC equal to the stack value at SP");
             Assert.AreEqual(memory.SP, testValue - 1, 0, "Did not deincrement SP properly");
         }
 
@@ -50,6 +52,22 @@ namespace chip8emuTests
 
             Assert.AreEqual(0x0111, memory.PC, 0, "Did not properly set PC to opcode value");
             Assert.AreEqual(9, memory.SP, 0, "Did not properly deincrement SP");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void CALL_Test()
+        {
+            ushort testOpcode = 0x2111;
+            memory.opcode = testOpcode;
+            memory.SP = 0;
+            memory.PC = testOpcode;
+
+            instructions.CALL();
+
+            Assert.AreEqual(1, memory.SP, 0, "Did not properly increment SP");
+            Assert.AreEqual(testOpcode, memory.stack[memory.SP], 0, "Did not properly store current opcode");
+            Assert.AreEqual(0x0111, memory.PC, 0, "Did not properly set PC to input value");
         }
     }
 }
