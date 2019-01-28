@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="emu\CPU.cs" />
     <Compile Include="emu\Instructions.cs" />
     <Compile Include="emu\Memory.cs" />
     <Compile Include="Game1.cs" />

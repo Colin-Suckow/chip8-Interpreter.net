@@ -8,6 +8,7 @@ namespace chip8emuTests
     public class MemoryTest
     {
         [TestMethod]
+        [TestCategory("Memory")]
         public void Memory_Write_And_Read()
         {
             Memory memory = new Memory();
@@ -24,6 +25,7 @@ namespace chip8emuTests
         }
 
         [TestMethod]
+        [TestCategory("Memory")]
         public void Register_Write_And_Read()
         {
             Memory memory = new Memory();
@@ -35,6 +37,7 @@ namespace chip8emuTests
         }
 
         [TestMethod]
+        [TestCategory("Memory")]
         public void Delay_And_Sound_Update()
         {
             Memory memory = new Memory();

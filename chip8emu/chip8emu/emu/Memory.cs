@@ -12,10 +12,13 @@ namespace chip8emu.emu
         private ushort[] map; //Main system memory map
         public byte[] V;  //V0 - VF Registers
         public ushort I; //I register
-        public byte PC; //Program Counter
+        public ushort PC; //Program Counter
         public byte SP; //Stack pointer
+        public ushort[] stack; //Address stack
         public byte delay; //Delay timer
         public byte sound; //Sound timer
+
+        public ushort opcode; //Stores current opcode - Might be moved in the future
 
         public Memory() {
             InitializeMemory();
@@ -45,6 +48,7 @@ namespace chip8emu.emu
 
         private void InitializeRegisters() {
             V = new byte[0xF];
+            stack = new ushort[16];
             I = 0;
             PC = 0;
             SP = 0;
