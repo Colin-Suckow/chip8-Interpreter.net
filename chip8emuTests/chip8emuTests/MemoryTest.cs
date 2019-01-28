@@ -27,11 +27,11 @@ namespace chip8emuTests
         public void Register_Write_And_Read()
         {
             Memory memory = new Memory();
-            ushort writeValue = 10;
+            byte writeValue = 10;
 
-            memory.registers["V0"] = writeValue;
+            memory.V[0x0] = writeValue;
 
-            Assert.AreEqual(writeValue, memory.registers["V0"]);
+            Assert.AreEqual(writeValue, memory.V[0x0]);
         }
 
         [TestMethod]
@@ -41,17 +41,17 @@ namespace chip8emuTests
 
             //Cycle the timers once and check to make sure they dont deincrement when their value is 0
             memory.UpdateTimers(); 
-            Assert.AreEqual(0, memory.registers["Delay"], 0, "Deincremented when 0");
-            Assert.AreEqual(0, memory.registers["Sound"], 0, "Deincremented when 0");
+            Assert.AreEqual(0, memory.delay, 0, "Deincremented when 0");
+            Assert.AreEqual(0, memory.sound, 0, "Deincremented when 0");
 
-            ushort writeValue = 10;
+            byte writeValue = 10;
 
-            memory.registers["Delay"] = writeValue;
-            memory.registers["Sound"] = writeValue;
+            memory.delay = writeValue;
+            memory.sound = writeValue;
             memory.UpdateTimers();
 
-            Assert.AreEqual(writeValue - 1, memory.registers["Delay"], 0, "Did not deincrement delay properly");
-            Assert.AreEqual(writeValue -1, memory.registers["Sound"], 0, "Did not deincrement sound properly");
+            Assert.AreEqual(writeValue - 1, memory.delay, 0, "Did not deincrement delay properly");
+            Assert.AreEqual(writeValue -1, memory.sound, 0, "Did not deincrement sound properly");
 
         }
     }

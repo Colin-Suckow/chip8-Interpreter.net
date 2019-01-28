@@ -9,8 +9,13 @@ namespace chip8emu.emu
 
     public class Memory
     {
-        private ushort[] map;
-        public Dictionary<string, ushort> registers;  //TODO: Decide if a public dictionary is a better idea then a method
+        private ushort[] map; //Main system memory map
+        public byte[] V;  //V0 - VF Registers
+        public ushort I; //I register
+        public byte PC; //Program Counter
+        public byte SP; //Stack pointer
+        public byte delay; //Delay timer
+        public byte sound; //Sound timer
 
         public Memory() {
             InitializeMemory();
@@ -39,45 +44,18 @@ namespace chip8emu.emu
         }
 
         private void InitializeRegisters() {
-            registers = new Dictionary<string, ushort>
-            {
-                //General registers
-                { "V0", 0 },
-                { "V1", 0 },
-                { "V2", 0 },
-                { "V3", 0 },
-                { "V4", 0 },
-                { "V5", 0 },
-                { "V6", 0 },
-                { "V7", 0 },
-                { "V8", 0 },
-                { "V9", 0 },
-                { "VA", 0 },
-                { "VB", 0 },
-                { "VC", 0 },
-                { "VD", 0 },
-                { "VE", 0 },
-                { "VF", 0 },
-
-                //Address register - only 16 bit register
-                { "I", 0 },
-
-                //Program counter
-                { "PC", 0 },
-
-                //Stack pointer
-                { "SP", 0 },
-
-                //Delay and sound timers
-                { "Delay", 0 },
-                { "Sound", 0 }
-            };
+            V = new byte[0xF];
+            I = 0;
+            PC = 0;
+            SP = 0;
+            delay = 0;
+            sound = 0;
         }
 
 
         public void UpdateTimers() {
-            if (registers["Delay"] != 0) registers["Delay"]--;
-            if (registers["Sound"] != 0) registers["Sound"]--;
+            if (delay != 0) delay--;
+            if (sound != 0) sound--;
         }
 
     }
