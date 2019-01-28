@@ -74,7 +74,21 @@ namespace chip8emuTests
         [TestCategory("Instruction")]
         public void SE_Test()
         {
+            byte testValue = 0xaa;
+            int testRegister = 2;
+            ushort testOpcode = 0x32aa;
+            memory.opcode = testOpcode;
+            memory.PC = 0;
+            memory.V[testRegister] = 0;
+
+            Assert.AreEqual(0, memory.PC, 0, "PC changed values");
+
+            memory.V[testRegister] = testValue;
+
+            instructions.SE();
             
+            Assert.AreEqual(2, memory.PC, 0, "PC did not increment properly");      
+
         }
 
     }

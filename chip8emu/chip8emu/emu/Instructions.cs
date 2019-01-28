@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -67,7 +68,10 @@ namespace chip8emu.emu
         /// </summary>
         public void SE()
         {
-
+            if (memory.V[(memory.opcode & 0x0F00) >> 8] == (memory.opcode & 0x00FF))
+            {
+                memory.PC += 2;
+            }
         }
     }
 }

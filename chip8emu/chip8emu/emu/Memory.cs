@@ -9,7 +9,7 @@ namespace chip8emu.emu
 
     public class Memory
     {
-        private ushort[] map; //Main system memory map
+        private ushort[] map; //Main system memory map - ushort because of the I register
         public byte[] V;  //V0 - VF Registers
         public ushort I; //I register
         public ushort PC; //Program Counter
