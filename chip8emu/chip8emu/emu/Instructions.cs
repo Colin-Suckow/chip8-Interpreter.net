@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using chip8emu.util;
 
 namespace chip8emu.emu
 {
@@ -15,11 +16,13 @@ namespace chip8emu.emu
         Memory memory;
 
         Random rand;
+        util.util util; //TODO: Figure out abstract class
 
         public Instructions(Memory memory)
         {
             this.memory = memory;
             rand = new Random();
+            util = new util.util();
         }
 
         ///Clears the display - This probably wont be handled in this class, so this function is probably temporary
@@ -373,10 +376,42 @@ namespace chip8emu.emu
         /// </summary>
         public void LD_B()
         {
-
+            int[] BCD = util.GetIntArray( memory.V[(memory.opcode & 0x0F00) >> 8] );
+            Console.WriteLine("Array length: " + BCD.Length);
+            for (int i = 0; i < BCD.Length; i++)
+            {
+                Console.WriteLine(BCD[i]);
+                memory.WriteByte(memory.I + i, (ushort)BCD[i]);
+            }
         }
 
+        /// <summary>
+        /// Fx55
+        /// Store register V0 through Vx in memory starting at location I
+        /// The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
+        /// </summary>
+        public void LD_TI()
+        {
+            int length = (memory.opcode & 0x0F00) >> 8;
+            for(int i = 0; i <= length; i++)
+            {
+                memory.WriteByte(memory.I + i, memory.V[i]);
+            }
+        }
 
+        /// <summary>
+        /// Fx65
+        /// Read registers V0 through Vx from memory starting at I
+        /// The interpreter reads values from memory starting at location I into registers V0 through Vx
+        /// </summary>
+        public void LD_TV()
+        {
+            int length = (memory.opcode & 0x0F00) >> 8;
+            for(int i = 0; i <= length; i++)
+            {
+                memory.V[i] = (byte) memory.ReadByte(memory.I + i);
+            }
+        }
 
     }
 }

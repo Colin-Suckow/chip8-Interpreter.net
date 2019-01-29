@@ -18,6 +18,8 @@ namespace chip8emu.emu
         public byte delay; //Delay timer
         public byte sound; //Sound timer
 
+        ushort programStart = 0x200;
+
         public ushort opcode; //Stores current opcode - Might be moved in the future
 
         public Memory() {
@@ -50,7 +52,7 @@ namespace chip8emu.emu
             V = new byte[16];
             stack = new ushort[16];
             I = 0;
-            PC = 0;
+            PC = programStart;
             SP = 0;
             delay = 0;
             sound = 0;

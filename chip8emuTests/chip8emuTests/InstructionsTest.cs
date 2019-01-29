@@ -446,21 +446,76 @@ namespace chip8emuTests
 
             Assert.AreEqual(10, memory.I, 0, "Did not add to I correctly");
         }
-
+        
         [TestMethod]
         [TestCategory("Instruction")]
         public void LD_F()
         {
             //TODO: Test for correct font loading once I add fonts to memory
         }
-
+        
         [TestMethod]
         [TestCategory("Instruction")]
         public void LD_B()
         {
-            //TODO: Test for correct font loading once I add fonts to memory
+            ushort testOpcode = 0xF133; //Store BCD of value in V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 123;
+            memory.I = 1000; //Set to 1000 to avoid font data
+            memory.WriteByte(memory.I, 0);
+            memory.WriteByte(memory.I + 1, 0);
+            memory.WriteByte(memory.I + 2, 0);
+            instructions.LD_B();
+            
+            Assert.AreEqual(1, memory.ReadByte(memory.I), 0, "Hundreds place inccorect");
+            Assert.AreEqual(2, memory.ReadByte(memory.I + 1), 0, "Tens place inccorect");
+            Assert.AreEqual(3, memory.ReadByte(memory.I + 2), 0, "Ones place inccorect");
+            
         }
 
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_TI_Test()
+        {
+            ushort testOpcode = 0xF355; //Store the data in V0 - V4 at position I
+            memory.opcode = testOpcode;
+            memory.I = 1000;
+            memory.V[0] = 1;
+            memory.V[1] = 2;
+            memory.V[2] = 3;
+            memory.V[3] = 4;
 
+            instructions.LD_TI();
+
+            Assert.AreEqual(1, memory.ReadByte(1000), 0, "Did not set 1st byte correctly");
+            Assert.AreEqual(2, memory.ReadByte(1000 + 1), 0, "Did not set 2nd byte correctly");
+            Assert.AreEqual(3, memory.ReadByte(1000 + 2), 0, "Did not set 3rd byte correctly");
+            Assert.AreEqual(4, memory.ReadByte(1000 + 3), 0, "Did not set 4th byte correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_TV()
+        {
+            ushort testOpcode = 0xF365; //Read 4 bytes into registers starting at I
+            int startLocation = 1000;
+            memory.WriteByte(startLocation, 1);
+            memory.WriteByte(startLocation + 1, 2);
+            memory.WriteByte(startLocation + 2, 3);
+            memory.WriteByte(startLocation + 3, 4);
+            memory.I = (ushort) startLocation;
+
+            memory.V[0] = 0;
+            memory.V[1] = 0;
+            memory.V[2] = 0;
+            memory.V[3] = 0;
+
+            instructions.LD_TV();
+
+            Assert.AreEqual(1, memory.ReadByte(startLocation), 0, "Did not read 1st byte correctly");
+            Assert.AreEqual(2, memory.ReadByte(startLocation + 1), 0, "Did not read 2nd byte correctly");
+            Assert.AreEqual(3, memory.ReadByte(startLocation + 2), 0, "Did not read 3rd byte correctly");
+            Assert.AreEqual(4, memory.ReadByte(startLocation + 3), 0, "Did not read 4th byte correctly");
+        }
     }
 }
