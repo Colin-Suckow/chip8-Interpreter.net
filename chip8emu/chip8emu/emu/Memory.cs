@@ -47,7 +47,7 @@ namespace chip8emu.emu
         }
 
         private void InitializeRegisters() {
-            V = new byte[0xF];
+            V = new byte[16];
             stack = new ushort[16];
             I = 0;
             PC = 0;

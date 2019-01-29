@@ -148,5 +148,194 @@ namespace chip8emuTests
             Assert.AreEqual(0xaa, memory.V[1], 0, "Did not load byte into register properly");
         }
 
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void ADD_BYTE_Test()
+        {
+            ushort testOpcode = 0x71aa; //Add aa to V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 5;
+            instructions.ADD_BYTE();
+
+            Assert.AreEqual(5 + 0xaa, memory.V[1], 0, "Did not add byte into register properly");
+
+            //Check overflow condition - should top out at 255
+            memory.V[1] = 250;
+            instructions.ADD_BYTE();
+            Assert.AreEqual(255, memory.V[1], 0, "Did not overflow correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_VY_Test()
+        {
+            ushort testOpcode = 0x8130; //Load V3 into V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0;
+            memory.V[3] = 1;
+            instructions.LD_VY();
+
+            Assert.AreEqual(1, memory.V[1], 0, "Did not load VY into register properly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void OR_Test()
+        {
+            ushort testOpcode = 0x8121; //Performs OR on V1 and V2
+            memory.opcode = testOpcode;
+            memory.V[1] = 0x0F;
+            memory.V[2] = 0xF0;
+            instructions.OR();
+
+            // 0x0F AND 0xF0 = 0xFF
+            Assert.AreEqual(0xFF, memory.V[1], 0, "Did not perform OR correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void AND_Test()
+        {
+            ushort testOpcode = 0x8122; //Performs AND on V1 and V2
+            memory.opcode = testOpcode;
+            memory.V[1] = 0x0F;
+            memory.V[2] = 0xF0;
+            instructions.AND();
+
+            // 0x0F AND 0xF0 = 0x00
+            Assert.AreEqual(0x00, memory.V[1], 0, "Did not perform OR correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void XOR_Test()
+        {
+            ushort testOpcode = 0x8122; //Performs XOR on V1 and V2
+            memory.opcode = testOpcode;
+            memory.V[1] = 0x0F;
+            memory.V[2] = 0xF0;
+            instructions.XOR();
+
+            // 0x0F XOR 0xF0 = 0xFF
+            Assert.AreEqual(0xFF, memory.V[1], 0, "Did not perform XOR correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void ADD_Test()
+        {
+            ushort testOpcode = 0x8124; //Adds V2 to V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 10;
+            memory.V[2] = 20;
+            memory.V[0xF] = 0;
+
+            instructions.ADD();
+
+            Assert.AreEqual(30, memory.V[1], 0, "Did not add correctly");
+
+            memory.V[1] = 250;
+            memory.V[2] = 50;
+            memory.V[0xF] = 0;
+
+            instructions.ADD();
+
+            Assert.AreEqual(255, memory.V[1], 0, "Did not add correctly at overflow");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set overflow flag");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SUB_Test()
+        {
+            ushort testOpcode = 0x8124; //Subtracts V2 from V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 20;
+            memory.V[2] = 10;
+            memory.V[0xF] = 0;
+
+            instructions.SUB();
+
+            Assert.AreEqual(10, memory.V[1], 0, "Did not subtract correctly");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set underflow flag");
+
+            memory.V[1] = 5;
+            memory.V[2] = 10;
+            memory.V[0xF] = 0;
+
+            instructions.SUB();
+
+            Assert.AreEqual(0, memory.V[1], 0, "Did not subtract correctly at underflow");
+            Assert.AreEqual(0, memory.V[0xF], 0, "Did not correctly set underflow flag");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SHR_Test()
+        {
+            ushort testOpcode = 0x8126; //Subtracts V2 from V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0xF0;
+            memory.V[0xF] = 0;
+
+            instructions.SHR();
+
+            Assert.AreEqual(0xF0 / 2, memory.V[1], 0, "Did not shift correctly");
+
+            memory.V[1] = 0xF1;
+            memory.V[0xF] = 0;
+
+            instructions.SHR();
+
+            Assert.AreEqual(0xF1 / 2, memory.V[1], 0, "Did not shift correctly with flag");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set shift flag");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SUBN_Test()
+        {
+            ushort testOpcode = 0x8127; //Subtracts V2 from V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 10;
+            memory.V[2] = 20;
+            memory.V[0xF] = 0;
+
+            instructions.SUBN();
+
+            Assert.AreEqual(10, memory.V[1], 0, "Did not subtract correctly");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set underflow flag");
+
+            memory.V[1] = 10;
+            memory.V[2] = 5;
+            memory.V[0xF] = 0;
+
+            instructions.SUBN();
+
+            Assert.AreEqual(0, memory.V[1], 0, "Did not subtract correctly at underflow");
+            Assert.AreEqual(0, memory.V[0xF], 0, "Did not correctly set underflow flag");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SHL_Test()
+        {
+            ushort testOpcode = 0x812E; //Subtracts V2 from V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0x0F;
+            memory.V[0xF] = 0;
+
+            instructions.SHL();
+
+            Assert.AreEqual(0x0F * 2, memory.V[1], 0, "Did not shift correctly");
+
+            memory.V[1] = 0x1F;
+            memory.V[0xF] = 0;
+
+            instructions.SHL();
+
+            Assert.AreEqual(0x1F * 2, memory.V[1], 0, "Did not shift correctly with flag");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set shift flag");
+        }
     }
 }
