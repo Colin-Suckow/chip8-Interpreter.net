@@ -14,9 +14,12 @@ namespace chip8emu.emu
 
         Memory memory;
 
+        Random rand;
+
         public Instructions(Memory memory)
         {
             this.memory = memory;
+            rand = new Random();
         }
 
         ///Clears the display - This probably wont be handled in this class, so this function is probably temporary
@@ -80,7 +83,7 @@ namespace chip8emu.emu
         /// The interpreter compares register Vx to kk, and if they are not equal, increments
         /// the program counter by 2
         /// </summary>
-        public void SNE()
+        public void SNE_BYTE()
         {
             if (memory.V[(memory.opcode & 0x0F00) >> 8] != (memory.opcode & 0x00FF))
             {
@@ -242,6 +245,60 @@ namespace chip8emu.emu
             memory.V[0xF] = 0;
             if ((memory.V[(memory.opcode & 0x0F00) >> 8] & 0b1000 >> 3) == 1) memory.V[0xF] = 1;
             memory.V[(memory.opcode & 0x0F00) >> 8] *= 2;
+        }
+
+        /// <summary>
+        /// 9xy0
+        /// Skip next instruction if Vx != Vy
+        /// The values of Vx and Vy are compared, and if they are not equal, the program
+        /// counter is increased by 2
+        /// </summary>
+        public void SNE_VY()
+        {
+            if (memory.V[(memory.opcode & 0x0F00) >> 8] != memory.V[(memory.opcode & 0x00F0) >> 4]) memory.PC += 2;
+        }
+
+        /// <summary>
+        /// Annn
+        /// Set I = nnn
+        /// The value of the I register is set to nnn.
+        /// </summary>
+        public void LD_I()
+        {
+            memory.I = (ushort) (memory.opcode & 0x0FFF);
+        }
+
+        /// <summary>
+        /// Bnnn
+        /// Jump to location nnn + v0
+        /// The program counter is set to nnn plus the value of V0
+        /// </summary>
+        public void JP_V0()
+        {
+            memory.PC = (ushort) (((memory.opcode & 0x0FFF) + memory.V[0]) & 0x0FFF);
+        }
+
+        /// <summary>
+        /// Cxkk
+        /// Set Vx = random byte AND kk
+        /// The interpreter generates a random number from 0 to 255, which is then ANDed with
+        /// the value kk. The results are then stored in Vx
+        /// TODO: Figure out how to test
+        /// </summary>
+        public void RND()
+        {
+            int random = rand.Next(0, 255) & (memory.opcode & 0x00FF);
+            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) random;
+        }
+
+        /// <summary>
+        /// Dxyn
+        /// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision
+        /// Check docs for full details, too long to put here
+        /// </summary>
+        public void DRW()
+        {
+            //TODO: Draw screen, probably won't be in this class
         }
     }
 }

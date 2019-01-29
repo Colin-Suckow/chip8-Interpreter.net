@@ -95,7 +95,7 @@ namespace chip8emuTests
 
         [TestMethod]
         [TestCategory("Instruction")]
-        public void SNE_Test()
+        public void SNE_BYTE_Test()
         {
             byte testValue = 0xaa;
             int testRegister = 2;
@@ -104,7 +104,7 @@ namespace chip8emuTests
             memory.PC = 0;
             memory.V[testRegister] = 0;
 
-            instructions.SNE();
+            instructions.SNE_BYTE();
 
             Assert.AreEqual(2, memory.PC, 0, "PC did not increment properly");
             
@@ -112,7 +112,7 @@ namespace chip8emuTests
             memory.V[testRegister] = testValue;
             memory.PC = 0;
 
-            instructions.SNE();
+            instructions.SNE_BYTE();
 
             Assert.AreEqual(0, memory.PC, 0, "PC changed values");
         }
@@ -336,6 +336,71 @@ namespace chip8emuTests
 
             Assert.AreEqual(0x1F * 2, memory.V[1], 0, "Did not shift correctly with flag");
             Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set shift flag");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SNE_VY_Test()
+        {
+            
+            ushort testOpcode = 0x9120; //Compares V1 and V2
+            memory.opcode = testOpcode;
+            memory.PC = 0;
+            memory.V[1] = 0;
+            memory.V[2] = 0;
+
+            instructions.SNE_VY();
+
+            Assert.AreEqual(0, memory.PC, 0, "PC changed values");
+
+
+            memory.V[1] = 1;
+            memory.PC = 0;
+
+            instructions.SNE_VY();
+
+            Assert.AreEqual(2, memory.PC, 0, "PC did not increment properly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_I_Test()
+        {
+            ushort testOpcode = 0xAFFF; //Set register to 0xFFF
+            memory.opcode = testOpcode;
+            memory.I = 0;
+
+            instructions.LD_I();
+
+            Assert.AreEqual(0xFFF, memory.I, 0, "Did not load I register properly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void JP_V0_Test()
+        {
+            ushort testOpcode = 0xBaaa; //set pc to aaa pus V0
+            memory.opcode = testOpcode;
+            memory.V[0] = 5;
+            memory.PC = 0;
+            instructions.JP_V0();
+
+            Assert.AreEqual(0xaaa + 5, memory.PC, 0, "Did not jump correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void RND_Test()
+        {
+            //Can't really test randomness, so leaving blank
+            //unless I think of something
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void DRW_Test()
+        {
+            //TODO: Tie into monogame to test drawing patterns
         }
     }
 }
