@@ -66,12 +66,50 @@ namespace chip8emu.emu
         /// The interpreter compares register Vx to kk, and if they are equal,
         /// increments the program counter by 2.
         /// </summary>
-        public void SE()
+        public void SE_BYTE()
         {
             if (memory.V[(memory.opcode & 0x0F00) >> 8] == (memory.opcode & 0x00FF))
             {
                 memory.PC += 2;
             }
+        }
+
+        /// <summary>
+        /// 4xkk
+        /// Skip next instruction if Vx != kk
+        /// The interpreter compares register Vx to kk, and if they are not equal, increments
+        /// the program counter by 2
+        /// </summary>
+        public void SNE()
+        {
+            if (memory.V[(memory.opcode & 0x0F00) >> 8] != (memory.opcode & 0x00FF))
+            {
+                memory.PC += 2;
+            }
+        }
+
+        /// <summary>
+        /// 5xy0
+        /// Skip next instruction if Vx = Vy
+        /// The interpreter compares register Vx to register Vy, and if they are equal, increments
+        /// the program counter by 2
+        /// </summary>
+        public void SE_VY()
+        {
+            if (memory.V[(memory.opcode & 0x0F00) >> 8] == memory.V[(memory.opcode & 0x00F0) >> 4])
+            {
+                memory.PC += 2;
+            }
+        }
+
+        /// <summary>
+        /// 6xkk
+        /// Set Vx = kk
+        /// The interpreter puts the value kk into register Vx
+        /// </summary>
+        public void LD_BYTE()
+        {
+            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) (memory.opcode & 0x00FF);
         }
     }
 }

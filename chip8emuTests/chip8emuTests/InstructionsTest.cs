@@ -81,14 +81,71 @@ namespace chip8emuTests
             memory.PC = 0;
             memory.V[testRegister] = 0;
 
+            instructions.SE_BYTE();
+
             Assert.AreEqual(0, memory.PC, 0, "PC changed values");
 
             memory.V[testRegister] = testValue;
 
-            instructions.SE();
+            instructions.SE_BYTE();
             
             Assert.AreEqual(2, memory.PC, 0, "PC did not increment properly");      
 
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SNE_Test()
+        {
+            byte testValue = 0xaa;
+            int testRegister = 2;
+            ushort testOpcode = 0x42aa;
+            memory.opcode = testOpcode;
+            memory.PC = 0;
+            memory.V[testRegister] = 0;
+
+            instructions.SNE();
+
+            Assert.AreEqual(2, memory.PC, 0, "PC did not increment properly");
+            
+
+            memory.V[testRegister] = testValue;
+            memory.PC = 0;
+
+            instructions.SNE();
+
+            Assert.AreEqual(0, memory.PC, 0, "PC changed values");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void SE_VY_Test()
+        {
+            ushort testOpcode = 0x5120; //Compare registers 1 and 2
+            memory.opcode = testOpcode;
+            memory.PC = 0;
+            memory.V[1] = 2;
+            memory.V[2] = 3;
+            instructions.SE_VY();
+            Assert.AreEqual(0, memory.PC, 0, "PC changed values");
+
+            memory.PC = 0;
+            memory.V[1] = 2;
+            memory.V[2] = 2;
+            instructions.SE_VY();
+            Assert.AreEqual(2, memory.PC, 0, "Pc did not increment properly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_BYTE_Test()
+        {
+            ushort testOpcode = 0x61aa; //Load aa into V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0;
+            instructions.LD_BYTE();
+
+            Assert.AreEqual(0xaa, memory.V[1], 0, "Did not load byte into register properly");
         }
 
     }
