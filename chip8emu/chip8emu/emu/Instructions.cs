@@ -300,5 +300,83 @@ namespace chip8emu.emu
         {
             //TODO: Draw screen, probably won't be in this class
         }
+
+        /// <summary>
+        /// Ex9E
+        /// Skip the next value if the key with the value of Vx is pressed
+        /// Checks the keyboard, if the key corresponding to the value of Vx is currently
+        /// in the down position, PC is increased by 2.
+        /// </summary>
+        public void SKP()
+        {
+            //TODO: Requires keyboard input with monogame
+        }
+
+
+        /// <summary>
+        /// ExA1
+        /// Skip the next value if the key with the value of Vx is not pressed
+        /// Checks the keyboard, if the key corresponding to the value of Vx is currently
+        /// in the up position, PC is increased by 2.
+        /// </summary>
+        public void SKNP()
+        {
+            //TODO: Requires keyboard input with monogame
+        }
+
+        /// <summary>
+        /// Fx15
+        /// Set delay timer = Vx
+        /// Delay is set equal to the value of Vx
+        /// </summary>
+        public void LD_DT()
+        {
+            memory.delay = memory.V[(memory.opcode & 0x0F00) >> 8];
+        }
+
+        /// <summary>
+        /// Fx18
+        /// Set sound timer = Vx
+        /// Sound is set equal to the value of Vx
+        /// </summary>
+        public void LD_ST()
+        {
+            memory.sound = memory.V[(memory.opcode & 0x0F00) >> 8];
+        }
+
+        /// <summary>
+        /// Fx1E
+        /// Set I = I + Vx
+        /// The values of I and Vx are added, and the results are stored in I
+        /// </summary>
+        public void ADD_I()
+        {
+            memory.I += memory.V[(memory.opcode & 0x0F00) >> 8];
+        }
+
+        /// <summary>
+        /// Fx29
+        /// Set I = location of sprite for digit Vx
+        /// The value of I is set to the memory location for the font sprite of the value in Vx
+        /// </summary>
+        public void LD_F()
+        {
+            //TODO: Add fonts to memory
+        }
+
+        /// <summary>
+        /// Fx33
+        /// Store BCD representation of Vx in memory locations I, I + 1, and I + 2
+        /// The interpreter takes the decimal value of Vx, and 
+        /// places the hundreds digit in memory at location in I, the tens digit at location I+1, 
+        /// and the ones digit at location I+2.
+        /// </summary>
+        public void LD_B()
+        {
+
+        }
+
+
+
     }
 }

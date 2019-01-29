@@ -402,5 +402,65 @@ namespace chip8emuTests
         {
             //TODO: Tie into monogame to test drawing patterns
         }
+
+        /*
+         * TODO: Make tests for SKP and SKNP, these require keyboard input
+         */
+
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_DT_Test()
+        {
+            ushort testOpcode = 0xF115; //Set delay to the value in V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0xFF;
+            memory.delay = 0;
+            instructions.LD_DT();
+
+            Assert.AreEqual(0xFF, memory.delay, 0, "Did not set delay correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_ST_Test()
+        {
+            ushort testOpcode = 0xF118; //Set sound to the value in V1
+            memory.opcode = testOpcode;
+            memory.V[1] = 0xFF;
+            memory.sound = 0;
+            instructions.LD_ST();
+
+            Assert.AreEqual(0xFF, memory.sound, 0, "Did not set sound correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void ADD_I_Test()
+        {
+            ushort testOpcode = 0xF11E; //Add I to value in V1
+            memory.opcode = testOpcode;
+            memory.I = 5;
+            memory.V[1] = 5;
+            instructions.ADD_I();
+
+            Assert.AreEqual(10, memory.I, 0, "Did not add to I correctly");
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_F()
+        {
+            //TODO: Test for correct font loading once I add fonts to memory
+        }
+
+        [TestMethod]
+        [TestCategory("Instruction")]
+        public void LD_B()
+        {
+            //TODO: Test for correct font loading once I add fonts to memory
+        }
+
+
     }
 }
