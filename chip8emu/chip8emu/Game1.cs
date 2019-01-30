@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using chip8emu.emu;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.IO;
 
 namespace chip8emu
 {
@@ -11,11 +14,19 @@ namespace chip8emu
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        KeyboardState oldState;
+
+        private SpriteFont font;
+
+        string filePath = "C:\\Users\\CS\\Downloads\\Particle Demo [zeroZshadow, 2008].ch8";
+
+        CPU cpu;
         
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            cpu = new CPU();
         }
 
         /// <summary>
@@ -26,7 +37,7 @@ namespace chip8emu
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            cpu.SetupSystem();
 
             base.Initialize();
         }
@@ -39,6 +50,19 @@ namespace chip8emu
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            font = Content.Load<SpriteFont>("debug");
+
+            byte[] data = File.ReadAllBytes(filePath);
+
+            for(int i = 0; i < data.Length - 1; i+=2)
+            {
+                Console.WriteLine(data[i].ToString("X") + data[i + 1].ToString("X"));
+            }
+
+            cpu.LoadProgram(data);
+
+            
 
             // TODO: use this.Content to load your game content here
         }
@@ -62,7 +86,17 @@ namespace chip8emu
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            KeyboardState newState = Keyboard.GetState();
+
+            //if(oldState.IsKeyDown(Keys.Space) && newState.IsKeyUp(Keys.Space))
+            //{
+                cpu.StepProcessor();
+                cpu.StepTimers();
+            //}
+
+            oldState = newState;
+
+            Console.WriteLine(cpu.memory.opcode);
 
             base.Update(gameTime);
         }
@@ -75,9 +109,24 @@ namespace chip8emu
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            spriteBatch.DrawString(font, getMonitorText(-3), new Vector2(700, 140), Color.Black);
+            spriteBatch.DrawString(font, getMonitorText(-2), new Vector2(700, 160), Color.Black);
+            spriteBatch.DrawString(font, getMonitorText(-1), new Vector2(700, 180), Color.Black);
+            spriteBatch.DrawString(font, getMonitorText(0), new Vector2(700, 200), Color.Red);
+            spriteBatch.DrawString(font, getMonitorText(1), new Vector2(700, 220), Color.Black);
+            spriteBatch.DrawString(font, getMonitorText(2), new Vector2(700, 240), Color.Black);
+            spriteBatch.DrawString(font, getMonitorText(3), new Vector2(700, 260), Color.Black);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        String getMonitorText(int position)
+        {
+            return "0x" + (cpu.memory.PC + position * 2).ToString("X") + " : " + cpu.memory.ReadByte(cpu.memory.PC + position * 2).ToString("X") + cpu.memory.ReadByte(cpu.memory.PC + (position * 2) + 1).ToString("X");
         }
     }
 }

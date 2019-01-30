@@ -28,6 +28,8 @@ namespace chip8emu.emu
         }
 
         public ushort ReadByte(int location) {
+            if (location < 0) location = 0;
+            if (location > 4095) location = 4095;
             return map[location];
         }
 
@@ -46,6 +48,14 @@ namespace chip8emu.emu
 
         private void InitializeMemory() {
             map = new ushort[4096];
+        }
+
+        public void LoadBytes(int location, byte[] data)
+        {
+            for(int i = 0; i < data.Length; i++)
+            {
+                WriteByte(location + i, data[i]);
+            }
         }
 
         private void InitializeRegisters() {

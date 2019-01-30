@@ -38,7 +38,7 @@ namespace chip8emu.emu
         /// </summary>
         public void RET()
         {
-            memory.PC = memory.SP;
+            memory.PC = memory.stack[memory.SP];
             memory.SP--;
         }
 
@@ -50,7 +50,6 @@ namespace chip8emu.emu
         public void JP()
         {
             memory.PC = (ushort) (memory.opcode & 0x0FFF);
-            memory.SP--;
         }
 
         /// <summary>
@@ -325,6 +324,16 @@ namespace chip8emu.emu
         public void SKNP()
         {
             //TODO: Requires keyboard input with monogame
+        }
+
+        /// <summary>
+        /// Fx07
+        /// Set Vx = delay timer value
+        /// The value of DT is placed into Vx
+        /// </summary>
+        public void LD_VX_DT()
+        {
+            memory.V[memory.opcode & 0x0F00 >> 8] = memory.delay;
         }
 
         /// <summary>

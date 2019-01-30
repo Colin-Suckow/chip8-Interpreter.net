@@ -19,7 +19,5 @@ namespace chip8emu.util
             listOfInts.Reverse();
             return listOfInts.ToArray();
         }
-
-
     }
 }
