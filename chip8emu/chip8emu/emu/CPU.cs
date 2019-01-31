@@ -18,9 +18,11 @@ namespace chip8emu.emu
 
         public void StepProcessor()
         {
+            memory.PC += 2;
             memory.opcode = (ushort) ((memory.ReadByte(memory.PC) << 8) | memory.ReadByte(memory.PC + 1));
             CallOpcode();
-            memory.PC += 2;
+            
+
         }
 
         //Call at 60hz
@@ -43,6 +45,11 @@ namespace chip8emu.emu
         public void LoadProgram(byte[] data)
         {
             memory.LoadBytes(0x200, data);
+        }
+
+        public byte[,] GetScrenBuffer()
+        {
+            return memory.screenBuffer;
         }
 
         /// <summary>

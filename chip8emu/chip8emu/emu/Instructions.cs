@@ -39,7 +39,10 @@ namespace chip8emu.emu
         public void RET()
         {
             memory.PC = memory.stack[memory.SP];
-            memory.SP--;
+            if(memory.SP > 0)
+            {
+                memory.SP--;
+            }
         }
 
         /// <summary>
@@ -198,11 +201,11 @@ namespace chip8emu.emu
         {
             memory.V[0xF] = 1;
             int difference = memory.V[(memory.opcode & 0x0F00) >> 8] - memory.V[(memory.opcode & 0x00F0) >> 4];
-            if(difference < 0)
+            if (memory.V[(memory.opcode & 0x00F0) >> 4] > memory.V[(memory.opcode & 0x0F00) >> 8])
             {
-                memory.V[0xF] = 0; //Flag is not borrow
-                difference = 0;
+                memory.V[0xF] = 0;
             }
+          
             memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) difference;
         }
 
@@ -300,7 +303,77 @@ namespace chip8emu.emu
         /// </summary>
         public void DRW()
         {
-            //TODO: Draw screen, probably won't be in this class
+
+
+
+
+            short x = memory.V[(memory.opcode & 0x0F00) >> 8];
+            short y = memory.V[(memory.opcode & 0x00F0) >> 4];
+            short height = (short)(memory.opcode & 0x000F);
+            byte pixel;
+
+            
+            for (int yline = 0; yline < height; yline++)
+            {
+                pixel = (byte)  memory.ReadByte(memory.I + yline);
+                for (int xline = 0; xline < 8; xline++)
+                {
+                    if ((pixel & (0x80 >> xline)) != 0)
+                    {
+
+                        if (x + xline > 64) break;
+                        if (y + yline > 32) break;
+
+                        if (memory.screenBuffer[x + xline, y + yline] == 1)
+                        {
+                            memory.V[0xF] = 1;
+                        }
+
+                        memory.screenBuffer[x + xline, y + yline] = (byte) (memory.screenBuffer[x + xline, y + yline] ^ 1);
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+            /*
+            int spriteLength = (memory.opcode & 0x000F);
+            int xPos = memory.V[(memory.opcode & 0x0F00) >> 8];
+            int yPos = memory.V[(memory.opcode & 0x00F0) >> 4];
+
+            for(int i = 0; i < spriteLength; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+
+                    int spriteX = xPos + j;
+                    int spriteY = yPos + i;
+
+                    if (spriteX > 63) spriteX = 63;
+                    if (spriteY > 31) spriteY = 31;
+
+                    if ((memory.screenBuffer[spriteX, spriteY] ^ (memory.ReadByte(memory.I + i) & 0x00FF)) >= 1)
+                    {
+                        memory.V[0xF] = 1;
+                        //Console.WriteLine("XORd pixel");
+
+                    }
+
+                    if ((memory.ReadByte(memory.I + i) & 0x00FF) >= 1)
+                    {
+                        //Console.WriteLine("Drawing pixel");
+                        memory.screenBuffer[spriteX, spriteY] = 1;
+                    }
+                }
+            }
+            */
         }
 
         /// <summary>

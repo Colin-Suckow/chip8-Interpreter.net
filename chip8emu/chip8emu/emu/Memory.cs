@@ -18,7 +18,9 @@ namespace chip8emu.emu
         public byte delay; //Delay timer
         public byte sound; //Sound timer
 
-        ushort programStart = 0x200;
+        public byte[,] screenBuffer; //Holds screen state for rendering
+
+        ushort programStart = 0x200 - 2;
 
         public ushort opcode; //Stores current opcode - Might be moved in the future
 
@@ -61,6 +63,7 @@ namespace chip8emu.emu
         private void InitializeRegisters() {
             V = new byte[16];
             stack = new ushort[16];
+            screenBuffer = new byte[64,32]; //63 by 31 pixel display, counting 0
             I = 0;
             PC = programStart;
             SP = 0;

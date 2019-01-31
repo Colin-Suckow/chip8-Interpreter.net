@@ -15,11 +15,12 @@ namespace chip8emu
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         KeyboardState oldState;
+        Texture2D canvas;
 
         private SpriteFont font;
 
-        string filePath = "C:\\Users\\CS\\Downloads\\Particle Demo [zeroZshadow, 2008].ch8";
-
+        string filePath = "C:\\Users\\CS\\Downloads\\BC_test.ch8";
+        //BC_test
         CPU cpu;
         
         public Game1()
@@ -38,7 +39,7 @@ namespace chip8emu
         protected override void Initialize()
         {
             cpu.SetupSystem();
-
+            
             base.Initialize();
         }
 
@@ -93,10 +94,10 @@ namespace chip8emu
                 cpu.StepProcessor();
                 cpu.StepTimers();
             //}
-
+           
             oldState = newState;
 
-            Console.WriteLine(cpu.memory.opcode);
+            //Console.WriteLine(cpu.memory.opcode);
 
             base.Update(gameTime);
         }
@@ -108,8 +109,11 @@ namespace chip8emu
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+           
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, DepthStencilState.Default, RasterizerState.CullNone, null);
+            this.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+            Rectangle renderWindowRect = new Rectangle(40, 50, 64 * 10, 32 * 10);
 
             spriteBatch.DrawString(font, getMonitorText(-3), new Vector2(700, 140), Color.Black);
             spriteBatch.DrawString(font, getMonitorText(-2), new Vector2(700, 160), Color.Black);
@@ -119,6 +123,8 @@ namespace chip8emu
             spriteBatch.DrawString(font, getMonitorText(2), new Vector2(700, 240), Color.Black);
             spriteBatch.DrawString(font, getMonitorText(3), new Vector2(700, 260), Color.Black);
 
+            spriteBatch.Draw(RenderScreen(GraphicsDevice, cpu.GetScrenBuffer(), 10), renderWindowRect, Color.White);
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -127,6 +133,58 @@ namespace chip8emu
         String getMonitorText(int position)
         {
             return "0x" + (cpu.memory.PC + position * 2).ToString("X") + " : " + cpu.memory.ReadByte(cpu.memory.PC + position * 2).ToString("X") + cpu.memory.ReadByte(cpu.memory.PC + (position * 2) + 1).ToString("X");
+        }
+
+        RenderTarget2D RenderScreen(GraphicsDevice device, byte[,] screenBuffer, int scaleFactor)
+        {
+            int width = screenBuffer.GetLength(0);
+            int height = screenBuffer.GetLength(1);
+            RenderTarget2D texture = new RenderTarget2D(device, width, height);
+            Color[] textureData = new Color[width * height];
+
+            for(int i = 0; i < textureData.Length; i++)
+            {
+                int textureX = i % width;
+                int textureY = i / width;
+                
+                
+                if(screenBuffer[textureX, textureY] != 0)
+                {
+                    textureData[i] = Color.White;
+                } else
+                {
+                    textureData[i] = Color.Black;
+                }
+                
+            }
+
+
+            GraphicsDevice.Textures[0] = null;
+            texture.SetData(textureData);
+            
+
+            return texture;
+        }
+
+        void PrintScreenBuffer()
+        {
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            for(int i = 0; i < cpu.memory.screenBuffer.GetLength(1); i++)
+            {
+                for(int j = 0; j < cpu.memory.screenBuffer.GetLength(0); j++)
+                {
+                    if(cpu.memory.screenBuffer[j, i] == 1)
+                    {
+                        Console.Write("#");
+                    }
+                    else
+                    {
+                        Console.Write(" ");
+                    }
+                }
+                Console.WriteLine("");
+            }
         }
     }
 }
