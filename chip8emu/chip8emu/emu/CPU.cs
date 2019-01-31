@@ -18,10 +18,11 @@ namespace chip8emu.emu
 
         public void StepProcessor()
         {
-            memory.PC += 2;
-            memory.opcode = (ushort) ((memory.ReadByte(memory.PC) << 8) | memory.ReadByte(memory.PC + 1));
-            CallOpcode();
             
+            memory.opcode = (ushort) ((memory.ReadByte(memory.PC) << 8) | memory.ReadByte(memory.PC + 1));
+            Console.WriteLine(memory.PC.ToString("X") + " : " + memory.opcode.ToString("X") + " | int: " + memory.opcode.ToString());
+            CallOpcode();
+            memory.PC += 2;
 
         }
 
@@ -60,12 +61,12 @@ namespace chip8emu.emu
             switch ((memory.opcode & 0xF000) >> 12)
             {
                 case 0x0:
-                    switch(memory.opcode & 0x000F)
+                    switch(memory.opcode & 0x00FF)
                     {
-                        case 0x0: //CLS
+                        case 0xE0: //CLS
                             break;
 
-                        case 0xE: //RET
+                        case 0xEE: //RET
                             instructions.RET();
                             break;
 
@@ -113,8 +114,8 @@ namespace chip8emu.emu
                             instructions.OR();
                             break;
 
-                        case 0x2: //AND_BYTE
-                            instructions.ADD_BYTE();
+                        case 0x2: //AND
+                            instructions.ADD();
                             break;
 
                         case 0x3: //XOR

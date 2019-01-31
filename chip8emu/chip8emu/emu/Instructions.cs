@@ -43,6 +43,7 @@ namespace chip8emu.emu
             {
                 memory.SP--;
             }
+            
         }
 
         /// <summary>
@@ -53,6 +54,8 @@ namespace chip8emu.emu
         public void JP()
         {
             memory.PC = (ushort) (memory.opcode & 0x0FFF);
+           
+            memory.PC -= 2; //JP shouldn't increment PC, so subtract to cancel out the addition later
         }
 
         /// <summary>
@@ -66,6 +69,7 @@ namespace chip8emu.emu
             memory.SP++;
             memory.stack[memory.SP] = memory.PC;
             memory.PC = (ushort)(memory.opcode & 0x0FFF);
+            memory.PC -= 2; //Call shouldn't increment PC, so subtract to cancel out later addition
         }
 
         /// <summary>
@@ -92,8 +96,10 @@ namespace chip8emu.emu
         {
             if (memory.V[(memory.opcode & 0x0F00) >> 8] != (memory.opcode & 0x00FF))
             {
+                
                 memory.PC += 2;
             }
+           
         }
 
         /// <summary>
@@ -128,9 +134,9 @@ namespace chip8emu.emu
         public void ADD_BYTE()
         {
             byte register = (byte) ((memory.opcode & 0x0F00) >> 8);
-            int sum = (memory.V[register] + (memory.opcode & 0x00FF)); 
-            if (sum > 255) sum = 255; //Cap sum at 255, not the most efficent, but whatever
-            memory.V[register] = (byte)sum;
+            int sum = (memory.V[register] + (memory.opcode & 0x00FF));
+
+            memory.V[register] = (byte)(sum % 256);
         }   
 
         /// <summary>
@@ -160,7 +166,7 @@ namespace chip8emu.emu
         /// </summary>
         public void AND()
         {
-            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte)(memory.V[(memory.opcode & 0x0F00) >> 8] & memory.V[(memory.opcode & 0x00F0) >> 4]);
+            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) (memory.V[(memory.opcode & 0x0F00) >> 8] & memory.V[(memory.opcode & 0x00F0) >> 4]);
         }
 
         /// <summary>
@@ -186,9 +192,10 @@ namespace chip8emu.emu
             if (sum > 255)
             {
                 memory.V[0xF] = 1;
-                sum = 255;
+                sum = sum % 0x00FF;
+                
             }
-            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) sum;
+            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte)(sum);
         }
 
         /// <summary>
@@ -234,7 +241,7 @@ namespace chip8emu.emu
             if (difference < 0)
             {
                 memory.V[0xF] = 0; //Flag is not borrow
-                difference = 0;
+                
             }
             memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) difference;
         }
@@ -280,7 +287,7 @@ namespace chip8emu.emu
         /// </summary>
         public void JP_V0()
         {
-            memory.PC = (ushort) (((memory.opcode & 0x0FFF) + memory.V[0]) & 0x0FFF);
+            memory.PC = (ushort) ((memory.opcode & 0x0FFF) + memory.V[0]);
         }
 
         /// <summary>
@@ -446,7 +453,8 @@ namespace chip8emu.emu
         /// </summary>
         public void LD_F()
         {
-            //TODO: Add fonts to memory
+            int num = memory.V[(memory.opcode & 0x0F00) >> 8];
+            memory.I = (ushort) (num * 5);
         }
 
         /// <summary>
