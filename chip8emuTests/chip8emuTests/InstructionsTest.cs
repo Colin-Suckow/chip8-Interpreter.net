@@ -257,7 +257,7 @@ namespace chip8emuTests
             instructions.SUB();
 
             Assert.AreEqual(10, memory.V[1], 0, "Did not subtract correctly");
-            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set underflow flag");
+            Assert.AreEqual(0, memory.V[0xF], 0, "Did not correctly set underflow flag");
 
             memory.V[1] = 5;
             memory.V[2] = 10;
@@ -266,7 +266,7 @@ namespace chip8emuTests
             instructions.SUB();
 
             Assert.AreEqual(0, memory.V[1], 0, "Did not subtract correctly at underflow");
-            Assert.AreEqual(0, memory.V[0xF], 0, "Did not correctly set underflow flag");
+            Assert.AreEqual(1, memory.V[0xF], 0, "Did not correctly set underflow flag");
         }
 
         [TestMethod]
