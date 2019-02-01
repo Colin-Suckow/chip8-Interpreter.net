@@ -11,9 +11,11 @@ namespace chip8emu.emu
         public Memory memory;
         Instructions instructions;
 
+       
+
         public CPU()
         {
-            SetupSystem();
+            SetupSystem(); 
         }
 
         public void StepProcessor()
@@ -37,7 +39,7 @@ namespace chip8emu.emu
             memory = new Memory();
             instructions = new Instructions(memory);
         }
-
+        
         public void ResetSystem()
         {
             memory.Reset();
@@ -64,6 +66,7 @@ namespace chip8emu.emu
                     switch(memory.opcode & 0x00FF)
                     {
                         case 0xE0: //CLS
+                            instructions.CLS();
                             break;
 
                         case 0xEE: //RET
@@ -115,7 +118,7 @@ namespace chip8emu.emu
                             break;
 
                         case 0x2: //AND
-                            instructions.ADD();
+                            instructions.AND();
                             break;
 
                         case 0x3: //XOR
@@ -192,6 +195,7 @@ namespace chip8emu.emu
                             break;
 
                         case 0x0A: //LD_K
+                            instructions.KEY_HALT();
                             break;
 
                         case 0x15: //LD_DT

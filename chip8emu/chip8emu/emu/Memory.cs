@@ -19,6 +19,7 @@ namespace chip8emu.emu
         public byte sound; //Sound timer
 
         public byte[,] screenBuffer; //Holds screen state for rendering
+        public Boolean[] keyState;
 
         ushort programStart = 0x200;
 
@@ -63,7 +64,8 @@ namespace chip8emu.emu
         private void InitializeRegisters() {
             V = new byte[16];
             stack = new ushort[16];
-            screenBuffer = new byte[64,32]; //63 by 31 pixel display, counting 0
+            screenBuffer = new byte[64,32]; //63 by 31 pixel display
+            keyState = new Boolean[16];
             I = 0;
             PC = programStart;
             SP = 0;
@@ -76,6 +78,11 @@ namespace chip8emu.emu
         public void UpdateTimers() {
             if (delay != 0) delay--;
             if (sound != 0) sound--;
+        }
+
+        public void SetKeyState(Boolean[] keystate)
+        {
+            this.keyState = keystate;
         }
 
 

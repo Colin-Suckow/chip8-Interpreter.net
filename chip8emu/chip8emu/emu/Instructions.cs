@@ -25,10 +25,16 @@ namespace chip8emu.emu
             util = new util.util();
         }
 
-        ///Clears the display - This probably wont be handled in this class, so this function is probably temporary
+        ///Clears the display
         public void CLS()
         {
-
+            for(int i = 0; i < memory.screenBuffer.GetLength(0); i++)
+            {
+                for(int j = 0; j < memory.screenBuffer.GetLength(1); j++)
+                {
+                    memory.screenBuffer[i, j] = 0;
+                }
+            }
         }
 
         /// <summary>
@@ -255,7 +261,7 @@ namespace chip8emu.emu
         public void SHL()
         {
             memory.V[0xF] = 0;
-            if ((memory.V[(memory.opcode & 0x0F00) >> 8] & 0b1000 >> 3) == 1) memory.V[0xF] = 1;
+            if ((memory.V[(memory.opcode & 0x0F00) >> 8] & 0x80) == 0x80) memory.V[0xF] = 1;
             memory.V[(memory.opcode & 0x0F00) >> 8] *= 2;
         }
 
@@ -310,77 +316,31 @@ namespace chip8emu.emu
         /// </summary>
         public void DRW()
         {
-
-
-
-
             short x = memory.V[(memory.opcode & 0x0F00) >> 8];
             short y = memory.V[(memory.opcode & 0x00F0) >> 4];
             short height = (short)(memory.opcode & 0x000F);
             byte pixel;
 
-            
+
             for (int yline = 0; yline < height; yline++)
             {
-                pixel = (byte)  memory.ReadByte(memory.I + yline);
+                pixel = (byte)memory.ReadByte(memory.I + yline);
                 for (int xline = 0; xline < 8; xline++)
                 {
                     if ((pixel & (0x80 >> xline)) != 0)
                     {
 
-                        if (x + xline > 64) break;
-                        if (y + yline > 32) break;
+                        
 
-                        if (memory.screenBuffer[x + xline, y + yline] == 1)
+                        if (memory.screenBuffer[(x + xline) % 64, (y + yline) % 32] == 1)
                         {
                             memory.V[0xF] = 1;
                         }
 
-                        memory.screenBuffer[x + xline, y + yline] = (byte) (memory.screenBuffer[x + xline, y + yline] ^ 1);
+                        memory.screenBuffer[(x + xline) % 64, (y + yline) % 32] = (byte)(memory.screenBuffer[(x + xline) % 64, (y + yline) % 32] ^ 1);
                     }
                 }
             }
-
-
-
-
-
-
-
-
-
-
-            /*
-            int spriteLength = (memory.opcode & 0x000F);
-            int xPos = memory.V[(memory.opcode & 0x0F00) >> 8];
-            int yPos = memory.V[(memory.opcode & 0x00F0) >> 4];
-
-            for(int i = 0; i < spriteLength; i++)
-            {
-                for(int j = 0; j < 8; j++)
-                {
-
-                    int spriteX = xPos + j;
-                    int spriteY = yPos + i;
-
-                    if (spriteX > 63) spriteX = 63;
-                    if (spriteY > 31) spriteY = 31;
-
-                    if ((memory.screenBuffer[spriteX, spriteY] ^ (memory.ReadByte(memory.I + i) & 0x00FF)) >= 1)
-                    {
-                        memory.V[0xF] = 1;
-                        //Console.WriteLine("XORd pixel");
-
-                    }
-
-                    if ((memory.ReadByte(memory.I + i) & 0x00FF) >= 1)
-                    {
-                        //Console.WriteLine("Drawing pixel");
-                        memory.screenBuffer[spriteX, spriteY] = 1;
-                    }
-                }
-            }
-            */
         }
 
         /// <summary>
@@ -391,7 +351,11 @@ namespace chip8emu.emu
         /// </summary>
         public void SKP()
         {
-            //TODO: Requires keyboard input with monogame
+            int key = memory.V[(memory.opcode & 0x0F00) >> 8];
+            if(memory.keyState[key])
+            {
+                memory.PC += 2;
+            }
         }
 
 
@@ -403,7 +367,30 @@ namespace chip8emu.emu
         /// </summary>
         public void SKNP()
         {
-            //TODO: Requires keyboard input with monogame
+            int key = memory.V[(memory.opcode & 0x0F00) >> 8];
+            if (!memory.keyState[key])
+            {
+                memory.PC += 2;
+            }
+        }
+
+        /// <summary>
+        /// Fx0A
+        /// Wait for a keypress and store the result in register VX
+        /// </summary>
+        public void KEY_HALT()
+        {
+            Boolean keyPressed = false;
+            for(int i = 0; i < memory.keyState.Length; i++)
+            {
+                if(memory.keyState[i])
+                {
+                    keyPressed = true;
+                    memory.V[(memory.opcode % 0x0F00) >> 8] = (byte) i;
+                    break;
+                } 
+            }
+            if (!keyPressed) memory.PC -= 2;
         }
 
         /// <summary>
@@ -413,7 +400,7 @@ namespace chip8emu.emu
         /// </summary>
         public void LD_VX_DT()
         {
-            memory.V[memory.opcode & 0x0F00 >> 8] = memory.delay;
+            memory.V[(memory.opcode & 0x0F00) >> 8] = memory.delay;
         }
 
         /// <summary>

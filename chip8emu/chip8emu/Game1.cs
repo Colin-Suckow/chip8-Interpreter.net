@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
 
+
 namespace chip8emu
 {
     /// <summary>
@@ -14,12 +15,10 @@ namespace chip8emu
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        KeyboardState oldState;
-        Texture2D canvas;
 
         private SpriteFont font;
 
-        string filePath = "C:\\Users\\CS\\Downloads\\BC_test.ch8";
+        string filePath = "C:\\Users\\CS\\Downloads\\moon.ch8";
         //BC_test
         CPU cpu;
         
@@ -39,7 +38,8 @@ namespace chip8emu
         protected override void Initialize()
         {
             cpu.SetupSystem();
-            
+            this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 500.0f);
+            this.IsMouseVisible = true;
             base.Initialize();
         }
 
@@ -77,6 +77,9 @@ namespace chip8emu
             // TODO: Unload any non ContentManager content here
         }
 
+        const float TIMER_RATE = 1000 / 60;
+        float timerCount = TIMER_RATE;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -87,18 +90,25 @@ namespace chip8emu
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            KeyboardState newState = Keyboard.GetState();
+            if(Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                cpu.ResetSystem();
+                byte[] data = File.ReadAllBytes(filePath);
+                cpu.LoadProgram(data);
+            }
 
-            //if(oldState.IsKeyDown(Keys.Space) && newState.IsKeyUp(Keys.Space))
-            //{
-                cpu.StepProcessor();
+            cpu.memory.SetKeyState(GetKeyState(Keyboard.GetState()));
+            cpu.StepProcessor();
+
+            float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
+            timerCount -= elapsedTime;
+
+            if (timerCount <= 0)
+            {
                 cpu.StepTimers();
-            //}
+                timerCount = TIMER_RATE;
+            }
            
-            oldState = newState;
-
-            //Console.WriteLine(cpu.memory.opcode);
-
             base.Update(gameTime);
         }
 
@@ -111,7 +121,7 @@ namespace chip8emu
             GraphicsDevice.Clear(Color.CornflowerBlue);
            
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, DepthStencilState.Default, RasterizerState.CullNone, null);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
             this.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             Rectangle renderWindowRect = new Rectangle(40, 50, 64 * 10, 32 * 10);
 
@@ -164,6 +174,40 @@ namespace chip8emu
             
 
             return texture;
+        }
+
+        Boolean[] GetKeyState(KeyboardState state)
+        {
+            Boolean[] keyboardState = new Boolean[16];
+
+            // Chip8 Key   Keyboard
+            // -------------------
+            // 1 2 3 C     1 2 3 4
+            // 4 5 6 D     q w e r
+            // 7 8 9 E     a s d f
+            // A 0 B F     z x c v
+
+            keyboardState[0x0] = state.IsKeyDown(Keys.X);
+            keyboardState[0x1] = state.IsKeyDown(Keys.D1);
+            keyboardState[0x2] = state.IsKeyDown(Keys.D2);
+            keyboardState[0x3] = state.IsKeyDown(Keys.D3);
+            keyboardState[0x4] = state.IsKeyDown(Keys.Q);
+            keyboardState[0x5] = state.IsKeyDown(Keys.W);
+            keyboardState[0x6] = state.IsKeyDown(Keys.E);
+            keyboardState[0x7] = state.IsKeyDown(Keys.A);
+            keyboardState[0x8] = state.IsKeyDown(Keys.S);
+            keyboardState[0x9] = state.IsKeyDown(Keys.D);
+            keyboardState[0xA] = state.IsKeyDown(Keys.Z);
+            keyboardState[0xB] = state.IsKeyDown(Keys.C);
+            keyboardState[0xC] = state.IsKeyDown(Keys.D4);
+            keyboardState[0xD] = state.IsKeyDown(Keys.R);
+            keyboardState[0xE] = state.IsKeyDown(Keys.F);
+            keyboardState[0xF] = state.IsKeyDown(Keys.V);
+
+
+
+
+            return keyboardState;
         }
 
         void PrintScreenBuffer()
