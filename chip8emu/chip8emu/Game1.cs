@@ -18,7 +18,7 @@ namespace chip8emu
 
         private SpriteFont font;
 
-        string filePath = "C:\\Users\\CS\\Downloads\\moon.ch8";
+        string filePath = "C:\\Users\\CS\\Documents\\Programming\\chip8-Interpreter.net\\games\\pong.ch8";
         //BC_test
         CPU cpu;
         
