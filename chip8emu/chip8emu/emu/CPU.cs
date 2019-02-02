@@ -22,7 +22,7 @@ namespace chip8emu.emu
         {
             
             memory.opcode = (ushort) ((memory.ReadByte(memory.PC) << 8) | memory.ReadByte(memory.PC + 1));
-            Console.WriteLine(memory.PC.ToString("X") + " : " + memory.opcode.ToString("X") + " | int: " + memory.opcode.ToString());
+            Console.WriteLine(memory.PC.ToString("X") + " : " + memory.opcode.ToString("X"));
             CallOpcode();
             memory.PC += 2;
 

@@ -16,7 +16,6 @@ namespace chip8emu.util
                 listOfInts.Add(num % 10);
                 num = num / 10;
             }
-            listOfInts.Reverse();
             return listOfInts.ToArray();
         }
     }

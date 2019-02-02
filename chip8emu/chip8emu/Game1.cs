@@ -18,7 +18,7 @@ namespace chip8emu
 
         private SpriteFont font;
 
-        string filePath = "C:\\Users\\CS\\Documents\\Programming\\chip8-Interpreter.net\\games\\pong.ch8";
+        string filePath = "C:\\Users\\Colin\\Source\\Repos\\chip8-Interpreter.net\\games\\pong.ch8";
         //BC_test
         CPU cpu;
         
@@ -125,13 +125,9 @@ namespace chip8emu
             this.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             Rectangle renderWindowRect = new Rectangle(40, 50, 64 * 10, 32 * 10);
 
-            spriteBatch.DrawString(font, getMonitorText(-3), new Vector2(700, 140), Color.Black);
-            spriteBatch.DrawString(font, getMonitorText(-2), new Vector2(700, 160), Color.Black);
-            spriteBatch.DrawString(font, getMonitorText(-1), new Vector2(700, 180), Color.Black);
-            spriteBatch.DrawString(font, getMonitorText(0), new Vector2(700, 200), Color.Red);
-            spriteBatch.DrawString(font, getMonitorText(1), new Vector2(700, 220), Color.Black);
-            spriteBatch.DrawString(font, getMonitorText(2), new Vector2(700, 240), Color.Black);
-            spriteBatch.DrawString(font, getMonitorText(3), new Vector2(700, 260), Color.Black);
+            DrawMemory();
+
+            DrawRegisters();
 
             spriteBatch.Draw(RenderScreen(GraphicsDevice, cpu.GetScrenBuffer(), 10), renderWindowRect, Color.White);
 
@@ -208,6 +204,35 @@ namespace chip8emu
 
 
             return keyboardState;
+        }
+
+        void DrawRegisters()
+        {
+            int startX = 700, startY = 30;
+
+            for(int i = 0; i <= 0xF; i++)
+            {
+                spriteBatch.DrawString(font, "V" + i.ToString("X") + " : " + cpu.memory.V[i], new Vector2(startX, startY + (i * 20)), Color.Black);
+            }
+            
+        }
+
+        void DrawMemory()
+        {
+            int startX = 700, startY = 400;
+
+            for(int i = -2; i < 3; i++)
+            {
+                if(i == 0)
+                {
+                    spriteBatch.DrawString(font, getMonitorText(i), new Vector2(startX, startY + (i * 20)), Color.Red);
+                }
+                else
+                {
+                    spriteBatch.DrawString(font, getMonitorText(i), new Vector2(startX, startY + (i * 20)), Color.Black);
+                }
+                
+            }
         }
 
         void PrintScreenBuffer()

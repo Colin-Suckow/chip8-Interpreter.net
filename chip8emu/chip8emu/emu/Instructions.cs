@@ -139,10 +139,7 @@ namespace chip8emu.emu
         /// </summary>
         public void ADD_BYTE()
         {
-            byte register = (byte) ((memory.opcode & 0x0F00) >> 8);
-            int sum = (memory.V[register] + (memory.opcode & 0x00FF));
-
-            memory.V[register] = (byte)(sum % 256);
+            memory.V[(memory.opcode & 0x0F00) >> 8] += (byte) (memory.opcode & 0x00FF);
         }   
 
         /// <summary>
@@ -152,7 +149,7 @@ namespace chip8emu.emu
         /// </summary>
         public void LD_VY()
         {
-            memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) memory.V[(memory.opcode & 0x00F0) >> 4];
+            memory.V[(memory.opcode & 0x0F00) >> 8] = memory.V[(memory.opcode & 0x00F0) >> 4];
         }
 
         /// <summary>
@@ -197,10 +194,12 @@ namespace chip8emu.emu
             int sum = memory.V[(memory.opcode & 0x0F00) >> 8] + memory.V[(memory.opcode & 0x00F0) >> 4];
             if (sum > 255)
             {
-                memory.V[0xF] = 1;
-                sum = sum % 0x00FF;
-                
+               memory.V[0xF] = 1;  
+            } else
+            {
+                memory.V[0xF] = 0;
             }
+            sum = sum & 0x00FF;
             memory.V[(memory.opcode & 0x0F00) >> 8] = (byte)(sum);
         }
 
@@ -212,9 +211,12 @@ namespace chip8emu.emu
         /// </summary>
         public void SUB()
         {
-            memory.V[0xF] = 1;
+            ;
             int difference = memory.V[(memory.opcode & 0x0F00) >> 8] - memory.V[(memory.opcode & 0x00F0) >> 4];
-            if (memory.V[(memory.opcode & 0x00F0) >> 4] > memory.V[(memory.opcode & 0x0F00) >> 8])
+            if (memory.V[(memory.opcode & 0x00F0) >> 4] < memory.V[(memory.opcode & 0x0F00) >> 8])
+            {
+                memory.V[0xF] = 1;
+            } else
             {
                 memory.V[0xF] = 0;
             }
@@ -242,12 +244,14 @@ namespace chip8emu.emu
         /// </summary>
         public void SUBN()
         {
-            memory.V[0xF] = 1;
+            
             int difference = memory.V[(memory.opcode & 0x00F0) >> 4] - memory.V[(memory.opcode & 0x0F00) >> 8];
-            if (difference < 0)
+            if (memory.V[(memory.opcode & 0x00F0) >> 4] > memory.V[(memory.opcode & 0x0F00) >> 8])
             {
-                memory.V[0xF] = 0; //Flag is not borrow
-                
+                memory.V[0xF] = 1;
+            } else
+            {
+                memory.V[0xF] = 0;
             }
             memory.V[(memory.opcode & 0x0F00) >> 8] = (byte) difference;
         }
@@ -321,7 +325,7 @@ namespace chip8emu.emu
             short height = (short)(memory.opcode & 0x000F);
             byte pixel;
 
-
+            memory.V[0xF] = 0;
             for (int yline = 0; yline < height; yline++)
             {
                 pixel = (byte)memory.ReadByte(memory.I + yline);
@@ -330,9 +334,7 @@ namespace chip8emu.emu
                     if ((pixel & (0x80 >> xline)) != 0)
                     {
 
-                        
-
-                        if (memory.screenBuffer[(x + xline) % 64, (y + yline) % 32] == 1)
+                        if ((memory.screenBuffer[(x + xline) % 64, (y + yline) % 32]) != 0)
                         {
                             memory.V[0xF] = 1;
                         }
